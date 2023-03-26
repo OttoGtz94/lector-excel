@@ -1,3 +1,5 @@
 /node_modules
 
 .env
+.vscode
+.~lock.excel-test.xlsx#
