@@ -22,6 +22,7 @@ const readExcel = (req, res) => {
 
 const postData = (req, res) => {
 	const { users } = req.body;
+	const duplicates = [];
 	if (users.length === 0) {
 		return res.json({
 			status: 404,
@@ -30,14 +31,29 @@ const postData = (req, res) => {
 	}
 	try {
 		users.forEach(async user => {
+			console.log('for');
 			const userExcelModel = await UserExcel(user);
+			const existData = await UserExcel.findOne({
+				userId: user.userId,
+				date: user.date,
+			});
 
-			await userExcelModel.save();
+			if (existData !== null) {
+				duplicates.push(userExcelModel);
+			} else {
+				await userExcelModel.save();
+			}
 		});
-		res.json({
-			status: 200,
-			msg: 'Guardado correctamente',
-		});
+		setTimeout(() => {
+			res.json({
+				status: 200,
+				msg: 'Guardado correctamente',
+				duplicates:
+					duplicates.length > 0
+						? duplicates
+						: 'No hubo duplicados',
+			});
+		}, 2000);
 	} catch (error) {
 		res.json({
 			status: 500,
@@ -46,4 +62,48 @@ const postData = (req, res) => {
 	}
 };
 
-export { readExcel, postData };
+const updateData = async (req, res) => {
+	if (Object.entries(req.body).length === 0) {
+		return res.json({
+			status: 404,
+			msg: 'No se encontro información para actualizar',
+		});
+	}
+
+	try {
+		await UserExcel.findByIdAndUpdate(
+			{
+				_id: req.params._id,
+			},
+			req.body,
+		);
+		res.json({
+			status: 200,
+			msg: 'Información actualizada',
+		});
+	} catch (error) {
+		res.json({
+			status: 500,
+			msg: 'Hubo un problema al actualizar',
+		});
+	}
+};
+
+const deleteData = async (req, res) => {
+	try {
+		await UserExcel.findOneAndDelete({
+			_id: req.body._id,
+		});
+		res.json({
+			status: 200,
+			msg: 'Se elimino correctamente',
+		});
+	} catch (error) {
+		res.json({
+			status: 500,
+			msg: 'Hubo un problema al eliminar',
+		});
+	}
+};
+
+export { readExcel, postData, updateData, deleteData };
