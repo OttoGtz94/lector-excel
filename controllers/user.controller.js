@@ -52,12 +52,17 @@ const login = async (req, res) => {
 			userName,
 		});
 
-		const successLogin = await bcrypt.compare(
-			password,
-			existUserName.password,
-		);
+		if (!existUserName) {
+			return res.status(400).json({
+				status: 404,
+				msg: 'Usuario y/o contraseña incorrectos',
+			});
+		}
 
-		if (!existUserName || !successLogin) {
+		const successLogin =
+			await existUserName.checkPassword(password);
+
+		if (!successLogin) {
 			return res.status(400).json({
 				status: 404,
 				msg: 'Usuario y/o contraseña incorrectos',
