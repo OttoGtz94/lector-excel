@@ -1,4 +1,7 @@
-import { generateId } from '../helpers/index.js';
+import {
+	generateId,
+	generateJWT,
+} from '../helpers/index.js';
 import UserModel from '../models/user.model.js';
 import bcrypt from 'bcrypt';
 
@@ -68,10 +71,11 @@ const login = async (req, res) => {
 				msg: 'Usuario y/o contraseña incorrectos',
 			});
 		}
+
 		res.json({
 			status: 200,
 			msg: 'Usuario autenticado',
-			userName,
+			token: generateJWT(existUserName),
 		});
 	} catch (error) {
 		res.json({
@@ -81,4 +85,22 @@ const login = async (req, res) => {
 	}
 };
 
-export { user, newUser, login };
+const changePassword = async (req, res) => {
+	const { userName, password } = req.body;
+	try {
+		const user = await UserModel.findOne({ userName });
+		user.password = password;
+		await user.save();
+		res.json({
+			status: 200,
+			msg: 'Contraseña actualizada correctamente',
+		});
+	} catch (error) {
+		res.json({
+			status: 500,
+			msg: 'Hubo un error al actualizar la contraseña',
+		});
+	}
+};
+
+export { user, newUser, login, changePassword };
