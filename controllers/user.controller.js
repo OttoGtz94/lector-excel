@@ -3,6 +3,7 @@ import {
 	generateJWT,
 } from '../helpers/index.js';
 import UserModel from '../models/user.model.js';
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
 const user = (req, res) => {
@@ -31,12 +32,11 @@ const newUser = async (req, res) => {
 		const userModel = new UserModel(req.body);
 
 		userModel.token = generateId();
-		const successUser = await userModel.save();
+		await userModel.save();
 
 		res.json({
 			status: 200,
 			msg: `El usuario ${req.body.name} se creo correctamente`,
-			successUser,
 		});
 	} catch (error) {
 		//console.log('Error User Controller newUser', error);
@@ -103,4 +103,18 @@ const changePassword = async (req, res) => {
 	}
 };
 
-export { user, newUser, login, changePassword };
+const hasToken = async (req, res) => {
+	const { token } = req.body;
+	const dataJWT = jwt.decode(token);
+	if (dataJWT !== null) {
+		res.json({
+			status: 200,
+			dataJWT,
+			msg: 'Autenticación Correcta',
+		});
+	} else {
+		res.json({ status: 400, msg: 'No existe el token' });
+	}
+};
+
+export { user, newUser, login, changePassword, hasToken };

@@ -11,7 +11,7 @@ export const generateJWT = user => {
 		{
 			id: user._id,
 			name: user.name,
-			lastName: user.firstName,
+			firstName: user.firstName,
 			userName: user.userName,
 		},
 		process.env.JWT,

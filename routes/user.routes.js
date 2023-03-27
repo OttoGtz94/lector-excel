@@ -1,6 +1,7 @@
 import express from 'express';
 import {
 	changePassword,
+	hasToken,
 	login,
 	newUser,
 	user,
@@ -12,5 +13,6 @@ router.get('/', user);
 router.post('/new-user', newUser);
 router.post('/login', login);
 router.post('/change-password', changePassword);
+router.post('/verify-token', hasToken);
 
 export default router;

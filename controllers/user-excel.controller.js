@@ -1,8 +1,30 @@
 import xlsx from 'xlsx';
 import UserExcel from '../models/user-excel.model.js';
+import path from 'path';
+import fs from 'fs';
 
 const readExcel = (req, res) => {
-	const file = xlsx.readFile('excel-test.xlsx');
+	console.log(req.body.data);
+	console.log(req.files);
+	/* fs.writeFile(
+		req.files[0].originalname,
+		req.files[0].buffer,
+		err => {
+			if (err) {
+				console.log('Error', err);
+			} else {
+				console.log('firsSin errores');
+			}
+		},
+	); */
+
+	const file = xlsx.readFile('excel-test.xlsx'); //funciona
+
+	/* console.log(req.body.excel);
+	const { pathname: root } = new URL(
+		'../',
+		import.meta.url,
+	); */
 
 	let data = [];
 	const sheets = file.SheetNames;
@@ -13,11 +35,11 @@ const readExcel = (req, res) => {
 			{ raw: false },
 		);
 		temp.forEach(res => {
-			console.log(res);
+			//console.log(res);
 			data.push(res);
 		});
 	}
-	res.json({ data });
+	res.json({ status: 200, data, excel: req.body.excel });
 };
 
 const postData = (req, res) => {
