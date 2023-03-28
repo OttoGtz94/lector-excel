@@ -2,22 +2,22 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const UserExcelSchema = new Schema({
-	userId: {
+	user_id: {
 		type: String,
 		trim: true,
 	},
-	userName: {
+	user_name: {
 		type: String,
 		trim: true,
 	},
 	date: {
 		type: Date, //mm-dd-yy
 	},
-	punchIn: {
+	punch_in: {
 		type: String,
 		trim: true,
 	},
-	punchOut: {
+	punch_out: {
 		type: String,
 		trim: true,
 	},

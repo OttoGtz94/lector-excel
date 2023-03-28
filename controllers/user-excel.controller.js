@@ -2,44 +2,37 @@ import xlsx from 'xlsx';
 import UserExcel from '../models/user-excel.model.js';
 import path from 'path';
 import fs from 'fs';
+import { clearUploads } from '../helpers/index.js';
 
 const readExcel = (req, res) => {
-	console.log(req.body.data);
-	console.log(req.files);
-	/* fs.writeFile(
-		req.files[0].originalname,
-		req.files[0].buffer,
-		err => {
-			if (err) {
-				console.log('Error', err);
-			} else {
-				console.log('firsSin errores');
-			}
-		},
-	); */
-
-	const file = xlsx.readFile('excel-test.xlsx'); //funciona
-
-	/* console.log(req.body.excel);
-	const { pathname: root } = new URL(
-		'../',
-		import.meta.url,
-	); */
-
-	let data = [];
-	const sheets = file.SheetNames;
-	//console.log({ file, sheets });
-	for (let i = 0; i < sheets.length; i++) {
-		const temp = xlsx.utils.sheet_to_json(
-			file.Sheets[file.SheetNames[i]],
-			{ raw: false },
+	try {
+		const file = xlsx.readFile(
+			`uploads/${req.files[0].originalname}`,
+			{},
 		);
-		temp.forEach(res => {
-			//console.log(res);
-			data.push(res);
+
+		let data = [];
+		const sheets = file.SheetNames;
+		for (let i = 0; i < sheets.length; i++) {
+			const temp = xlsx.utils.sheet_to_json(
+				file.Sheets[file.SheetNames[i]],
+				{ raw: false },
+			);
+			temp.forEach(res => {
+				data.push(res);
+			});
+		}
+		res.json({
+			status: 200,
+			data,
+			msg: `El archivo ${req.files[0].originalname} se leyo satisfactoriamente`,
+		});
+	} catch (error) {
+		res.json({
+			status: 500,
+			msg: 'Hubo un problema al leer el archivo',
 		});
 	}
-	res.json({ status: 200, data, excel: req.body.excel });
 };
 
 const postData = (req, res) => {
@@ -53,10 +46,9 @@ const postData = (req, res) => {
 	}
 	try {
 		users.forEach(async user => {
-			console.log('for');
 			const userExcelModel = await UserExcel(user);
 			const existData = await UserExcel.findOne({
-				userId: user.userId,
+				user_id: user.user_id,
 				date: user.date,
 			});
 
