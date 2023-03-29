@@ -1,8 +1,5 @@
 import xlsx from 'xlsx';
 import UserExcel from '../models/user-excel.model.js';
-import path from 'path';
-import fs from 'fs';
-import { clearUploads } from '../helpers/index.js';
 
 const readExcel = (req, res) => {
 	try {
