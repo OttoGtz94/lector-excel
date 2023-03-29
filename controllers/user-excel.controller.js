@@ -35,6 +35,32 @@ const readExcel = (req, res) => {
 	}
 };
 
+const getRegisters = async (req, res) => {
+	try {
+		const registers = await UserExcel.find({
+			user_creator_id: req.params._id,
+		});
+
+		if (registers.length > 0) {
+			res.json({
+				status: 200,
+				msg: 'Los datos se obtuvieron satisfactoriamente.',
+				registers,
+			});
+		} else {
+			res.json({
+				status: 400,
+				msg: 'No se encontraron registros',
+			});
+		}
+	} catch (error) {
+		res.json({
+			status: 500,
+			msg: 'Hubo un error al obtener los registros.',
+		});
+	}
+};
+
 const postData = (req, res) => {
 	const { users } = req.body;
 	const duplicates = [];
@@ -48,6 +74,7 @@ const postData = (req, res) => {
 		users.forEach(async user => {
 			const userExcelModel = await UserExcel(user);
 			const existData = await UserExcel.findOne({
+				user_creator_id: user.user_creator_id,
 				user_id: user.user_id,
 				date: user.date,
 			});
@@ -77,6 +104,8 @@ const postData = (req, res) => {
 };
 
 const updateData = async (req, res) => {
+	/* console.log(req.body, req.params);
+	res.json({ status: 200 }); */
 	if (Object.entries(req.body).length === 0) {
 		return res.json({
 			status: 404,
@@ -106,7 +135,7 @@ const updateData = async (req, res) => {
 const deleteData = async (req, res) => {
 	try {
 		await UserExcel.findOneAndDelete({
-			_id: req.body._id,
+			_id: req.params._id,
 		});
 		res.json({
 			status: 200,
@@ -120,4 +149,10 @@ const deleteData = async (req, res) => {
 	}
 };
 
-export { readExcel, postData, updateData, deleteData };
+export {
+	readExcel,
+	postData,
+	updateData,
+	deleteData,
+	getRegisters,
+};

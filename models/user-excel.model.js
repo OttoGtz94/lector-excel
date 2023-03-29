@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const UserExcelSchema = new Schema({
+	user_creator_id: Schema.Types.ObjectId,
 	user_id: {
 		type: String,
 		trim: true,
